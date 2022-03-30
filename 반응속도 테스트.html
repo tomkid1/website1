@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      #screen {
+        width: auto;
+        height: 500px;
+        text-align: center;
+        user-select: none;
+      }
+      #screen.waiting {
+        background-color: yellow;
+      }
+      #screen.ready {
+        background-color: red;
+        color: white;
+      }
+      #screen.now {
+        background-color: greenyellow;
+      }
+      #screen.point{
+        background-color:white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen" class="waiting">클릭하면 시작!</div>
+    <div id="result"></div>
+
+    <script>
+      const $screen = document.querySelector('#screen');
+      const $result = document.querySelector('#result');
+
+      let startTime;
+      let endTime;
+      const records = [];
+      let timeoutId
+
+      $screen.addEventListener('click',(event)=>{
+        if (event.target.classList.contains('waiting')) {
+          event.target.classList.replace('waiting','ready');
+          event.target.textContent = '초록색 화면에서 클릭하세요';
+          timeoutId = setTimeout(function () {
+            startTime = new Date();  // 시작시간 측정
+            event.target.classList.replace('ready','now');
+            event.target.textContent = '지금 클릭하세여!';
+          }, Math.floor(Math.random() * 1000)+2000);
+        }else if (event.target.classList.contains('ready')) {
+          clearTimeout(timeoutId);
+          event.target.classList.replace('ready','waiting');
+          event.target.textContent = '성질이 급하시네요; 클릭하여 다시 시작';
+
+        }else if (event.target.classList.contains('now')) {
+          endTime = new Date();
+          const nowRecords = endTime - startTime;
+          records.push(nowRecords);
+          const avRecords = records.reduce((a,c)=>{return a+c}) / records.length;
+          $result.textContent = `현재: ${nowRecords}ms ,평균: ${avRecords}ms`;
+          const rank = records.sort((a , b) => a - b).slice(0,5);
+          rank.forEach((top, index) => {
+            $result.append(
+              document.createElement('br'),
+                `${index + 1}위: ${top}ms`
+            );
+          });
+          startTime = null;
+          endTime = null;
+          event.target.classList.replace('now','point');
+          if (nowRecords<100) {
+            $screen.textContent = '프로게이머 도전! 챌린저급 반응속도!'
+            return;
+          }
+          else if (nowRecords<150) {
+            $screen.textContent = '천상계?! 마스터급 반응속도!'
+            return;
+          }
+          else if (nowRecords<200) {
+            $screen.textContent = '말도안돼! 다이아급 반응속도!'
+            return;
+          }
+          else if (nowRecords<250) {
+            $screen.textContent = '빠르다 빨라! 플레티넘급 반응속도!'
+            return;
+          }
+          else if (nowRecords<300) {
+            $screen.textContent = '좀 치는데? 골드급 반응속도!'
+            return;
+          }
+          else if (nowRecords<400) {
+            $screen.textContent = '느려~ 실버급 반응속도!'
+            return;
+          }
+          else if (nowRecords<450) {
+            $screen.textContent = '롤에서 만나지말자! 브론즈급 반응속도!'
+            return;
+          }
+          else {
+            $screen.textContent = '사람인가...? 아이언급 반응속도!'
+            return;
+          }
+        }
+        else if (event.target.classList.contains('point')){
+          event.target.classList.replace('point','waiting');
+          event.target.textContent = '클릭하여 다시시작';
+        }
+      });
+
+    </script>
+  </body>
+</html>
